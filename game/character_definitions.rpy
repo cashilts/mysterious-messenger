@@ -595,6 +595,7 @@ default z = ChatCharacter("ZEN", 'z', 'Profile Pics/Zen/zen-default.png',
 
 # These are special 'characters' for additional features
 default special_msg = ChatCharacter("msg")
+default test_char = ChatCharacter("test", "delete")
 default filler = ChatCharacter("filler")
 default answer = ChatCharacter('answer', 'delete')
 default chat_pause = ChatCharacter('pause', 'delete')
