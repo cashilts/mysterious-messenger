@@ -34,7 +34,7 @@ label example_email():
             z "They'll decrease by an additional 1 when you exit this chatroom."
             z "In other words, guests will reply to you more quickly!"
     z "If you ever want to learn about inviting guests in the game,"
-    z "there's a whole section on emails in the User Guide."
+    z "there's a whole section on emails in the wiki."
     z "You can also look at {b}tutorial_2_emails.rpy{/b}"
     z "It shows how this invitation works,"
     z "and has a template to invite other people."
@@ -52,7 +52,7 @@ label example_email_expired():
     z "Oh... [they_re] not here."   (bounce=True, specBubble="sigh_m")
     z "Hmm." 
     z "Well, you can always buy back this chatroom and let me know if you want to invite them or not!" 
-    z "I'll see you around~"   (bounce=True, specBubble="round_m")
+    z "I'll see you around~"   (bounce=True, specBubble="flower_m")
     call exit(z)
     jump chat_end
 

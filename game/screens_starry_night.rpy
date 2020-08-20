@@ -1,7 +1,8 @@
 init -1 python:
 
-    ## Picks a random position for the star to appear at
     def star_func(trans,st,at):
+        """Display the star at a random position."""
+
         trans.ypos = renpy.random.random()
         trans.xpos = renpy.random.random()
         return None
@@ -98,7 +99,7 @@ screen loading_screen():
         yalign 0.018
         idle 'load_close'
         hover Transform('load_close', zoom=1.05)
-        action [Hide('splash_screen_test'), Return()]
+        action [Return()]
         
         
     add 'load_tip 'xalign 0.13 yalign 0.32
@@ -124,7 +125,7 @@ default loading_tips = [
     "Tap the Links button in the hub screen to go to the Mysterious Messenger Discord.",
     "Want to contribute to the program? Submit a pull request to the Mysterious Messenger Github!",
     "There are many accessibility options in the Settings menu.",
-    "Found a bug? Report it on the Mysterious Message GitHub.",
+    "Found a bug? Report it on the Mysterious Messenger GitHub.",
     "Like the program? Consider donating to my Ko-Fi in Links.",
     "Is there a feature you want to see? Let me know in the Mysterious Messenger Discord.",
     "Did you know? You can turn on Audio Captions from the Settings menu.",

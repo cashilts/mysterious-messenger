@@ -16,9 +16,13 @@
 
 init python:
 
-    ## This lets the player change the MC's profile picture
-    ## by clicking on it. You can upload your own images as well
     def MC_pic_change():
+        """
+        Changes the MC's profile picture when pressed. Cycles through
+        images present in a particular folder, allowing users to upload
+        their own images.
+        """
+
         global m, persistent
         
         # If not using a custom pic, check if one's available
@@ -51,9 +55,13 @@ init python:
         renpy.retain_after_load()
 
     def MC_pic_display(st, at):
+        """Ensure the MC's profile picture is always up-to-date."""
+
         return Transform(store.persistent.MC_pic, size=(363,363)), None
 
     def MC_name_display(st, at):
+        """Ensure the MC's name is always up-to-date."""
+
         return Text(persistent.name, 
             color ="#fff",
             text_align =0.0,
@@ -63,15 +71,19 @@ init python:
             yalign =0.455), None
     
 init -6 python:
-    ## Check for common image extensions
+    
     def isImg(pic):
+        """Return True if pic is determined to be an image file."""
+
         # if not (isinstance(pic, str) or isinstance(pic, unicode)):
         #     return False
         pic = pic.lower()
-        if '.png' or '.jpg' or '.jpeg' or '.gif' or '.webp' in pic:
-            return True
-        else:
-            return False
+        extension_list = ['.png', '.jpg', '.jpeg', '.gif', '.webp']
+        
+        for ext in extension_list:
+            if ext in pic:
+                return True        
+        return False
         
     
 default email_tone_dict = { 
@@ -292,9 +304,9 @@ image change_mc_pfp = DynamicDisplayable(MC_pic_display)
 
 init python:
 
-    ## Receives a Route object and determines how many endings
-    ## out of the list have been played
     def completed_branches(r):
+        """Determine how many endings in Route r have been played."""
+
         num_end = 0
         # Go through default branch backwards to find ending
         for lbl in r.ending_chatrooms:
@@ -718,8 +730,8 @@ screen preferences():
                     use toggle_buttons('banners', "Chatroom Banners")
                     use toggle_buttons('autoanswer_timed_menus', 
                                         "Auto-Answer Timed Menus")
-                    use toggle_buttons('heart_notifications', 
-                                        "Heart Icon Notifications")
+                    use toggle_buttons('animated_icons', 
+                                        "Animated Icons")
                     use toggle_buttons('dialogue_outlines', 
                                         "Dialogue Outlines")
                     
@@ -789,6 +801,8 @@ screen toggle_buttons(field, title):
             text_style 'toggle_panel_button_text'
             if len(title) > 16:
                 text_size 25
+            if len(title) > 24:
+                text_size 22
             action ToggleField(persistent, field)
 
 transform toggle_btn_transform:
@@ -1009,9 +1023,7 @@ screen sound_settings():
                     for c in all_characters:
                         # Unknown and Saeran are lumped into Ray's
                         # voice button and MC doesn't speak
-                        if c in [u, sa, m]:
-                            pass
-                        else:
+                        if c not in [u, sa, m]:
                             use voice_buttons(c)
                     use voice_buttons("Other", 'other')      
                         
@@ -1216,7 +1228,8 @@ screen ringtone_dropdown(title, tone):
                                     SetField(persistent, 
                                         p_field + '_name', tone)]
                         else:
-                            action [Stop('sound'),
+                            action [Stop('sound'), 
+                                    Play('music', "<silence 5.0>"),                                   
                                     Play('sound', ("<from 0 to 5>" 
                                         + the_dict[tone])),
                                     SetField(persistent, 

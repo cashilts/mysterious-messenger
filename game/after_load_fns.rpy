@@ -4,14 +4,22 @@ init python:
     ## define variables that have yet to exist so that save files
     ## continue to work
     def update_var_compatibility():
-        while store._version != "2.1":
-            float_ver = float(store._version)
-            # Update persistent values to be compatible with v2.0            
+        """
+        Update this save file for compatibility with new versions.
+        """
+
+        while store._version != "2.2":
+            if store._version == "2.1.1":
+                float_ver = 2.1001
+            else:
+                float_ver = float(store._version)
+                        
+            # Update persistent values to be compatible with v2.0           
             if float_ver < 2.00:
                 reset_old_persistent()
                 store._version = '2.00'
 
-
+            # Update Routes for the history screen
             if float_ver <= 2.00:
                 try:
                     for r in all_routes:
@@ -41,11 +49,21 @@ init python:
                                             day.archive_list[
                                                 -1].chatroom_label)
                 store._version = '2.1'
+
+            # persistent.heart_notification changed to persistent.animated_icons
+            if float_ver < 2.2:
+                store.persistent.animated_icons = not store.persistent.heart_notifications
+                store._version = "2.2"
+            
+            store._version = "2.2"
                                         
 
-    ## Finds the last chatroom after the string and adds the appropriate
-    ## label to the route's ending_chatrooms list
     def find_route_endings(route, chatlist, titles):
+        """
+        Find the last chatroom after a given string and add the appropriate
+        label to the route's ending_chatrooms list.
+        """
+
         # First, count the number of strings (endings) in this list
         extra_ending_titles = []
         ending_indices = []
@@ -82,9 +100,10 @@ init python:
                 route.ending_chatrooms.append(chatlist[i-1].vn_label)
         return extra_ending_titles
 
-    ## Resets problematic persistent values to their original value
-    ## but saves unchanged ones and restores them
+
     def reset_old_persistent():
+        """Reset problematic persistent values to their original values."""
+
         # First, save HP and HG
         temp_HP = store.persistent.__dict__['HP']
         temp_HG = store.persistent.__dict__['HG']
@@ -95,6 +114,7 @@ init python:
         temp_audio_captions = store.persistent.__dict__['audio_captions']
         temp_autoanswer_timed_menus = store.persistent.__dict__['autoanswer_timed_menus']
         temp_heart_notifications = store.persistent.__dict__['heart_notifications']
+        temp_animated_icons = store.persistent.__dict__['animated_icons']
         temp_dialogue_outlines = store.persistent.__dict__['dialogue_outlines']
         temp_starry_contrast = store.persistent.__dict__['starry_contrast']
         temp_window_darken_pct = store.persistent.__dict__['window_darken_pct']
@@ -130,6 +150,7 @@ init python:
         store.persistent.audio_captions = temp_audio_captions
         store.persistent.autoanswer_timed_menus = temp_autoanswer_timed_menus
         store.persistent.heart_notifications = temp_heart_notifications
+        store.persistent.animated_icons = temp_animated_icons
         store.persistent.dialogue_outlines = temp_dialogue_outlines
         store.persistent.starry_contrast = temp_starry_contrast
         store.persistent.window_darken_pct = temp_window_darken_pct
@@ -169,9 +190,9 @@ init python:
         
 
     
-    ## Several variables are defined here to ensure they're
-    ## set properly when you begin a game
     def define_variables():
+        """Merge albums and set up the player's profile."""
+        
         global all_albums        
         set_pronouns()
         
@@ -195,7 +216,7 @@ init python:
 ## loading. It also advances the game day if real-time
 ## mode is active
 ########################################################     
-label after_load():    
+label after_load():
     python:
         if persistent.real_time:
             if persistent.load_instr == '+1 day':
@@ -249,7 +270,7 @@ label after_load():
         n_call = unseen_calls
         
         if n_email + n_text + n_call > 0:
-            # We should show the player a message
+            # Show the player a notification of unread messages
             popup_msg += "You have "
         
             if n_email > 0:
@@ -281,6 +302,4 @@ label after_load():
     if popup_msg != "":
         show screen confirm(yes_action=Hide('confirm'), message=popup_msg)
     return     
-
-    
 

@@ -16,6 +16,8 @@ default persistent.audio_captions = False
 default persistent.autoanswer_timed_menus = False
 # Displays notifications instead of heart icons
 default persistent.heart_notifications = False
+# New version of the above option
+default persistent.animated_icons = True
 # Adds outline to VN dialogue
 default persistent.dialogue_outlines = False
 # Controls the contrast of the starry night background
@@ -42,9 +44,10 @@ default persistent.window_darken_pct = 50
 image vn_window_darken = "VN Mode/Chat Bubbles/vnmode_darken.png"
 
 init python:
-    ## This adjusts the alpha channels of the window
-    ## backgrounds used in VN mode
+    
     def adjust_vn_alpha():
+        """Adjust the alpha channels of window backgrounds used in VN mode."""
+
         global persistent
         # When window_darken_pct <= 50, only lighten the main window
         if persistent.window_darken_pct <= 50:

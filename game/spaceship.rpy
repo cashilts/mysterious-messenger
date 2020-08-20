@@ -1,9 +1,9 @@
 
 init python:
 
-    ## This is used to make the spaceship float to a random 
-    ## location on the line
     def spaceship_xalign_func(trans,st,at):
+        """Make the spaceship float to a random location on the line."""
+
         global spaceship_xalign
         if st > 1.0:
             trans.xalign = spaceship_xalign
@@ -15,26 +15,41 @@ init python:
         trans.xalign = spaceship_xalign
         return None
         
-    ## Returns a random position along the spaceship line at the bottom
-    ## of the screen
     def spaceship_get_xalign(new_num=False):
+        """
+        Return a random position along the spaceship line at the bottom
+        of the screen to move the spaceship to.
+        """
+
         global spaceship_xalign
         if new_num:
             spaceship_xalign = renpy.random.random()
             spaceship_xalign = spaceship_xalign * 0.8 + 0.04
         return spaceship_xalign
         
-    ## This code is used to create a 'random' function that
-    ## will occasionally activate the Honey Buddha Chip bag
     class RandomBag(object):
+        """
+        Class that is used to create a 'random bag' of supplied choices.
+
+        Attributes:
+        -----------
+        choices : list
+            A list of choices. Can be booleans, strings, ints, a mix, etc.
+        bag : list
+            A shuffled list of the provided choices.
+        """
 
         def __init__(self, choices):
+            """Creates a RandomBag object."""
+            
             # The choices that go into the bag.
             self.choices = choices                        
             # A shuffled list of things in the bag.
             self.bag = [ ]                                
 
         def draw(self):
+            """Removes an item from the bag."""
+
             # If the bag is empty,
             if not self.bag:                              
                 # Replace it with a copy of choices,
@@ -45,16 +60,31 @@ init python:
             # Return something from the bag.
             return self.bag.pop(0)                        
             
-        # Reset the bag with new choices
-        def new_choices(self, choices):                   
+        def new_choices(self, choices):
+            """Reset the bag with new choices."""
+
             self.choices = choices
-            self.bag = [ ]
+            self.bag = list(self.choices)
+            renpy.random.shuffle(self.bag)
             
-    # This class keeps track of "Space Thoughts" in 
-    # order to show the correct image + text combo
-    # to the player
     class SpaceThought(renpy.store.object):
+        """
+        Class which keeps track of 'Space Thoughts' in order to show the
+        correct image + text combo to the player.
+
+        Attributes:
+        -----------
+        char : ChatCharacter
+            The character having this thought.
+        thought : string
+            The thought for this character.
+        img : string
+            The image used as the background for this thought.
+        """
+
         def __init__(self, char, thought):
+            """Creates a SpaceThought object."""
+
             self.char = char
             self.thought = thought
             self.img = char.file_id + '_spacethought'
@@ -172,7 +202,7 @@ screen chip_cloud():
 label hbc_helper():
     $ prize = chip_prize_list.draw()
     $ prize_text = prize[0]
-    # Adds a bit of randomness to the heart payout
+    # Add a bit of randomness to the heart payout
     $ prize_heart = (prize[1] 
         + (renpy.random.randint(0, prize[1]//10) 
             * renpy.random.choice([1, -1])))
@@ -220,9 +250,6 @@ screen chip_end(prize_heart, prize_hg, new_hp_total, new_hg_total, prize_text):
             frame:
                 xysize(200,60)
                 background 'space_black_box'
-                # You could give out hourglasses here too, but since I've
-                # never gotten one from the HBC animation I've just left
-                # it permanently at 0
                 text str(prize_hg) style 'chip_prize_text'
                 add 'header_hg' xalign 0.15 yalign 0.5
                 

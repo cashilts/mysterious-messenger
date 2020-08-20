@@ -65,7 +65,24 @@ screen answer_button():
                     Hide('speed_num'), 
                     Show("speed_num")]
 
-    
+#####################################
+# Continue Button
+##################################### 
+## This button appears when transitioning from
+## a chatroom directly into a VN
+screen continue_button():
+    zorder 4
+    tag chat_footer
+    if persistent.custom_footers:
+        add 'custom_darklight_continue_button' ypos 1220
+    else:
+        add 'darklight_continue_button' ypos 1220
+    imagebutton:
+        ypos 1220
+        focus_mask None
+        idle 'transparent_answer'
+        action Return()
+
 #####################################
 # Pause/Play footers
 #####################################
@@ -86,6 +103,7 @@ screen pause_button():
     if not choosing:
         use fast_slow_buttons()
         
+
 # This is automatically called when you pause the chat;
 # it makes sure no messages are skipped        
 label play():
@@ -162,9 +180,9 @@ image in_chat_display = DynamicDisplayable(in_chat_fn)
 default myClock = Clock(120) 
 
 init python:
-    ## Used for a dynamic displayable to display the 
-    ## names of the characters in the chatroom
     def in_chat_fn(st, at):
+        """Display the names of the characters in the chatroom."""
+
         list_of_char = ''
         for index, chara in enumerate(store.in_chat):
             list_of_char += chara
@@ -173,9 +191,9 @@ init python:
 
         return Text(list_of_char, style='in_chat_list_style'), 0.1
 
-    ## Displays the charging or fully charged icons depending on
-    ## battery level
     def battery_charge_icon(st, at):    
+        """Display the charging or fully charged battery icons."""
+
         # 0 = no idea what the status is, or -1
         # 1 = running on battery, not plugged in
         # 2 = plugged in, no battery available
@@ -189,9 +207,9 @@ init python:
         else:
             return Transform('transparent', size=(18,26)), 0.5
 
-    ## Returns the correct battery level image to use depending
-    ## on remaining power
     def battery_level_bar(st, at):
+        """Return the battery level image to use depending on remaining power."""
+
         battery = renpy.display.behavior.pygame.power.get_power_info()
         if battery.percent > 50:
             img1 = "battery_high"
@@ -203,9 +221,12 @@ init python:
         return Fixed(img1, Fixed('charging_icon', 
             size=(18,26), xalign=0.5, yalign=0.4)), 0.5
 
-    ## Returns a compound image of the battery empty image plus the
-    ## correct charging/charged image to make up a full bar icon
     def battery_empty_bar(st, at):
+        """
+        Return a compound image of the battery empty image plus the
+        correct charging/charged image to make up a full battery icon.
+        """
+
         battery = renpy.display.behavior.pygame.power.get_power_info()
         return Fixed("battery_empty_img", 
                 Fixed('charging_icon', 
@@ -349,24 +370,36 @@ default timed_choose = False
 default reply_instant = False
 default using_timed_menus = False
 
-label continue_answer(themenu, count_time=5):
+init python:
 
-    # Timed answers to speed up/slow down based on how fast 
-    # the player has the chat speed set to. Default is 0.8,
-    # increased/decreased by 0.15 (aka increased/decreased by
-    # 18.75% each time)
-    python:
+    def timed_answer_modifier(count_time):
+        """Return count_time modified to account for the current pv."""
+
         modifier = 1.00
         if renpy.is_skipping():
             # Max Speed active
             modifier = 0.0
-        modifier = 0.1875 * (((store.pv - 0.2) / 0.15) - 4)
+        else:
+            modifier = 0.1875 * (((store.pv - 0.2) / 
+                                store.chat_speed_increment) - 4)
+        return count_time + (count_time * modifier)
         
-        # So if the player has speed 9, which is pv=0.2 or 
-        # 175% as fast as regular speed, the time should also
-        # decrease by 75%
-        count_time += count_time * modifier
+## A helper label which will pause the chat for the given
+## number of seconds in count_time, multiplied by a modifier
+## depending on how fast the chat speed is
+label timed_pause(count_time):
+    if not _in_replay:
+        # Timed answers don't show up in replays, so don't pause
+        pause timed_answer_modifier(count_time)
+    return
 
+# Timed answers to speed up/slow down based on how fast 
+# the player has the chat speed set to. Default is 0.8,
+# increased/decreased by 0.15 (aka increased/decreased by
+# 18.75% each time)
+# So if the chat is at 3x normal speed, the time to answer
+# the menu is decreased by 3x
+label continue_answer(themenu, count_time=5):
     # Timed menus don't show up for players who are skipping 
     # through entire conversations or who are replaying an existing
     # chatroom. Not allowing 'observing' players to choose an
@@ -374,10 +407,11 @@ label continue_answer(themenu, count_time=5):
     # choose an answer being unable to continue
     if not renpy.is_skipping() and not observing:
         $ using_timed_menus = True
-        show screen answer_countdown(themenu, count_time)
+        show screen answer_countdown(themenu, timed_answer_modifier(count_time))
         hide screen viewCG
         $ pre_choosing = True
         show screen continue_answer_button(themenu)
+        pause 0.01
     else:
         $ timed_choose = False
     return

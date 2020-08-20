@@ -8,7 +8,19 @@
     # calls after it by using labels such as `starter_chat_incoming_ja` or 
     # `after_starter_chat`. You can also include a VN section before this
     # chatroom.
-    $ new_route_setup(route=tutorial_good_end)
+    $ new_route_setup(route=tutorial_route)
+
+    # This tells the program which characters' profiles you want to see
+    # on the hub screen / available for phone calls / etc
+    $ character_list = [ju, z, s, y, ja, v, m, r, ri]
+    # This tells the program which characters to show on the Profile screen
+    # next to how many heart points the player has earned
+    $ heart_point_chars = [ju, z, s, y, ja, v, r, ri]
+
+    # If you don't want an introduction, you can uncomment this line
+    # When the player starts the game, they will be immediately taken
+    # to the hub screen
+    # jump skip_intro_setup
 
     # If you want to begin with a phone call, this is
     # how you do it. Just replace 'u' with whatever
@@ -135,10 +147,7 @@
             u "Well, the first thing I recommend is to just play through the Tutorial Day." 
             u "It showcases some of the features so you know what sorts of things you can do with the program." 
     
-    
     u "I won't keep you much longer. Enjoy the program!" 
     call exit(u) 
     
     jump chat_end
-
-
